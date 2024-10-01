@@ -12,8 +12,9 @@ def add():
         if mode.isdigit():
             if mode == '1':
                 amount = input("Please enter the amount spent on transaction: ")
-                category = input("Please enter the category of spending: ")
-            
+                category = input("Please enter the category of spending (Press enter to leave empty): ")
+                if category == '':
+                        category = 'Uncategorized'
 
                 if amount.isdigit():
                     amount =int(amount)
@@ -39,7 +40,9 @@ def add():
                 amount = input("Please enter the amount spent on transaction: ")
                 if amount.isdigit():
                     amount = int(amount)
-                    category = input("Please enter the category of spending: ")
+                    category = input("Please enter the category of spending (Press enter to leave empty): ")
+                    if category == '':
+                        category = 'Uncategorized'
                     data = sqlite3.connect("Tracker.db")
                     cur = data.cursor()
                     cur.execute("INSERT INTO WALLET VALUES(:Day,:Month,:Year,:Cash,:Bank,:Credit,:Debit)",{"Day":datetime.now().day,"Month":datetime.now().month,"Year":datetime.now().year,"Cash":0,"Bank":0-amount,"Credit":0,"Debit":amount})
@@ -65,7 +68,9 @@ def add():
                 if debit_cash.isdigit() and debit_bank.isdigit():
                     debit_cash = int(debit_cash)
                     debit_bank = int(debit_bank)
-                    category = input("Please enter the category of spending: ")
+                    category = input("Please enter the category of spending (Press enter to leave empty): ")
+                    if category == '':
+                        category = 'Uncategorized'
                     data = sqlite3.connect('Tracker.db')
                     cur = data.cursor()
                     cur.execute("INSERT INTO WALLET VALUES(:Day,:Month,:Year,:Cash,:Bank,:Credit,:Debit)",{"Day":datetime.now().day,"Month":datetime.now().month,"Year":datetime.now().year,"Cash":0-debit_cash,"Bank":0-debit_bank,"Credit":0,"Debit":debit_cash+debit_bank})
@@ -436,44 +441,105 @@ def lend():
             if user == 1:
                 data = sqlite3.connect('Tracker.db')
                 cur = data.cursor()
-                cur.execute("SELECT * FROM Lending_Record WHERE Lender = Borrowed")
+                cur.execute("SELECT * FROM Lending_Record WHERE Lender = 'Borrowed'")
                 result = cur.fetchall()
                 data.commit()
                 cur.close()
                 if result:
                     for row in result:
-                        day,month,year,amount,name,category = row
+                        day,month,year,amount,name,lend,category = row
                         print(f"Date: {year:04d}-{month:02d}-{day:02d}, Amount: {amount}, Name: {name}, Category: {category}")
                 else:
                     print("No records found.")
             elif user == 2:
+                amount = input("Enter the amount you borrowed: ")
+                if amount.isdigit():
+                    amount = int(amount)
+                    name = input("Enter the name of person you owe money: ")
+                    category = input("Enter the category for which you owe money (Press enter to leave empty): ")
+                    if category == '':
+                        category = 'Uncategorized'
+                    data = sqlite3.connect('Tracker.db')
+                    cur = data.cursor()
+                    cur.execute("INSERT INTO Lending_Record VALUES(:Day,:Month,:Year,:Amount,:Name,:Lender,:Category)",{'Day':datetime.now().day,'Month':datetime.now().month,'Year':datetime.now().year,'Amount':amount,'Name':name,'Lender':'Borrowed','Category':category})
+                    data.commit()
+                    cur.close()
+                else:
+                    print("Invalid amount! Please enter a valid number...")
+                print("Record added successfully.")
+            elif user == 3:
                 data = sqlite3.connect('Tracker.db')
                 cur = data.cursor()
-                cur.execute("INSERT INTO Lending_Record VALUES(:Day,:Month,:Year,:Amount,:Name,:Lend,:Category)")
+                cur.execute("SELECT * FROM Lending_Record WHERE Lender ='Lent' ")
+                result = cur.fetchall()
+                data.commit()
+                cur.close()
+                if result:
+                    for row in result:
+                        day,month,year,amount,name,lend,category = row
+                        print(f"Date: {year:04d}-{month:02d}-{day:02d}, Amount: {amount}, Name: {name}, Category: {category}")
+                else:
+                    print("No records found.")
+
+            elif user == 4:
+                amount = input("Enter the amount you lent: ")
+                if amount.isdigit():
+                    amount = int(amount)
+                    name = input("Enter the name of person who owes you money: ")
+                    category = input("Enter the category for which they owe you money (Press enter to leave empty): ")
+                    if category == '':
+                        category = 'Uncategorized'
+                    data = sqlite3.connect('Tracker.db')
+                    cur = data.cursor()
+                    cur.execute("INSERT INTO Lending_Record VALUES(:Day,:Month,:Year,:Amount,:Name,:Lender,:Category)",{'Day':datetime.now().day,'Month':datetime.now().month,'Year':datetime.now().year,'Amount':amount,'Name':name,'Lender':'Lent','Category':category})
+                    data.commit()
+                    cur.close()
+                else:
+                    print("Invalid amount! Please enter a valid number...")
+                print("Record added successfully.")
+
             elif user == 5:
                 break
             else:
                 print("Invalid amount! Please enter a valid number...")
         else:
             print("Invalid amount! Please enter a valid number...")
-        
-    
 
+def statement():
+    data = sqlite3.connect("Tracker.db")
+    cur = data.cursor()        
 def delete():
-
-    user = input('''Are you sure you want to delete all records? 
-                 1. To continue -> Press 1
-                 2. To cancel -> Press any key''')
-    if user == '1':
-        data = sqlite3.connect('Tracker.db')
-        cur = data.cursor()
-        cur.execute("DROP TABLE WALLET")
-        data.commit()
-        cur.execute("DROP TABLE Transaction_Record")
-        data.commit()
-        cur.close()
+    user = input('''Are you sure you want to delete the records? 
+                 1. If yes -> Press 1
+                 2. To return to previous menu -> Press any key''')
+    if user.isdigit():
+        user = input('''
+                    1. To delete the Transaction History -> Press 1
+                    2. To delete the Wallet -> Press 2
+                    3. To delete the Lending Records -> Press 3
+                    4. To delete all records -> Press 4
+                    5. To return to previous menu -> Press any other key''')
+        if user.isdigit():
+            data = sqlite3.connect('Tracker.db')
+            cur = data.cursor()
+            if user == '1':
+                cur.execute("DROP TABLE Transaction_Record")
+            elif user == '2':
+                cur.execute("DROP TABLE WALLET")
+            elif user == '3':
+                cur.execute("DROP TABLE Lending_Record")
+            elif user == '4':
+                cur.execute("DROP TABLE Transaction_Record")
+                cur.execute("DROP TABLE Lending_Record")
+                cur.execute("DROP TABLE WALLET")
+            else:
+                pass
+            data.commit()
+            cur.close()
+        else:
+            print("Invalid Operation! Please enter valid input...")
     else:
-        pass
+        print("Invalid Operation! Please enter valid input...")
 
 
 if __name__ == "__main__":
@@ -484,28 +550,29 @@ if __name__ == "__main__":
             (Day INTEGER,
              Month INTEGER,
              Year INTEGER,
-             Cash INTEGER,
-             Bank INTEGER,
-             Credit INTEGER,
-             Debit INTEGER)
+             Cash FLOAT,
+             Bank FLOAT,
+             Credit FLOAT,
+             Debit FLOAT)
             ''')
         data.commit()
         cur.execute('''CREATE TABLE IF NOT EXISTS Transaction_Record
             (Day INTEGER,
              Month INTEGER,
              Year INTEGER,
-             Amount INTEGER,
+             Amount FLOAT,
              Category TEXT)
             ''')
         cur.execute('''CREATE TABLE IF NOT EXISTS Lending_Record
-            (Day FLOAT,
-             Month FLOAT,
-             Year FLOAT,
+            (Day INTEGER,
+             Month INTEGER,
+             Year INTEGER,
              Amount FLOAT,
              Name TEXT,
              Lender TEXT,
              Category TEXT)
             ''')
+        
         data.commit()
         cur.close()
         user = input('''_____WELCOME TO FINANCE TRACKER_____
