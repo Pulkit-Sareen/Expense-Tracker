@@ -177,14 +177,14 @@ def remove():
         else:
             print("Invalid Operation! Please enter valid input...")   
 
-def expenditure():
+def statement():
     while True:
         user = input('''What would you like to view:
-                     1. To view weekly expenditure details -> Press 1
-                     2. To view monthly expenditure details -> Press 2
-                     3. To view quarterly expenditure details -> Press 3
-                     4. To view half-yearly expenditure details -> Press 4
-                     5. To view yearly expenditure details -> Press 5
+                     1. To view weekly statement details -> Press 1
+                     2. To view monthly statement details -> Press 2
+                     3. To view quarterly statement details -> Press 3
+                     4. To view half-yearly statement details -> Press 4
+                     5. To view yearly statement details -> Press 5
                      6. To exit to previous menu -> Press 6
                      ''')
         
@@ -504,10 +504,7 @@ def lend():
                 print("Invalid amount! Please enter a valid number...")
         else:
             print("Invalid amount! Please enter a valid number...")
-
-def statement():
-    data = sqlite3.connect("Tracker.db")
-    cur = data.cursor()        
+      
 def delete():
     user = input('''Are you sure you want to delete the records? 
                  1. If yes -> Press 1
@@ -579,7 +576,7 @@ if __name__ == "__main__":
                     Please choose the one of the following options to proceed
                     1. To add a financial record -> Press 1
                     2. To remove a financial record -> Press 2
-                    3. To view detailed total expenditure -> Press 3
+                    3. To view detailed statement -> Press 3
                     4. To view wallet -> Press 4
                     5. To open money lending tracker -> Press 5
                     6. To exit -> Press 6 
@@ -592,7 +589,7 @@ if __name__ == "__main__":
             elif user == 2:
                 remove()
             elif user == 3:
-                expenditure()
+                statement()
             elif user == 4:
                 wallet()
             elif user == 5:
