@@ -402,10 +402,6 @@ def wallet():
                 print("Invalid operation! Please enter a valid option...")
 
 def graph(result):
-
-# defaultdict: A subclass of the built-in dict, this simplifies the code by avoiding key errors and automatically assigning an initial value (0) to keys that don’t exist yet.
-# Key-Value Storage: Dates are stored as keys (date_key), and amounts are stored as values (grouped_data[date_key]). This allows efficient grouping of data based on the date.
-
     grouped_data =defaultdict(int)
     for row in result:
         day,month,year,amount,category = row
@@ -423,7 +419,7 @@ def graph(result):
     plt.xlabel('Date')
     plt.ylabel('Total Expenditure')
     plt.title('Expenditure Grouped by Day')
-    plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for better readability
+    plt.xticks(rotation=45, ha='right') 
     plt.tight_layout()
     plt.show()
 
